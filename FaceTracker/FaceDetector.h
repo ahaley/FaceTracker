@@ -1,14 +1,16 @@
-#include "cv.h"
-#include "highgui.h"
+#include "opencv2/objdetect/objdetect.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+
 
 class FaceDetector
 {
 public:
 	FaceDetector();
 	bool Initialize();
-	void DetectAndDraw(IplImage* image);
+	void DetectAndDraw(cv::Mat image);
 
 private:
 	CvMemStorage* storage;
-	CvHaarClassifierCascade* classifier;
+	cv::CascadeClassifier classifier;
 };

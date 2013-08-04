@@ -37,5 +37,8 @@
     <Xml Include="haarcascade_frontalface_alt.xml">
       <Filter>Resource Files</Filter>
     </Xml>
+    <Xml Include="haarcascade_frontalface_alt2.xml">
+      <Filter>Resource Files</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

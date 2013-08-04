@@ -2,10 +2,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-
 #include <stdio.h>
-#include "cv.h"
-#include "highgui.h"
+#include "opencv2/highgui/highgui.hpp"
 #include "ServoController.h"
 #include "FaceDetector.h"
 
@@ -29,7 +27,6 @@ int main()
 		return -1;
 	}
 
-/*
 	FaceDetector faceDetector;
 
 	if (!faceDetector.Initialize()) {
@@ -37,41 +34,30 @@ int main()
 		controller.Disconnect();
 		return -1;
 	}
-	*/
+	
 	cvNamedWindow("mywindow", CV_WINDOW_AUTOSIZE);
 	
-	IplImage *frame, *frameCopy = 0;
+	cv::Mat frame;
 
 	while (1) {
 		frame = cvQueryFrame(capture);
-		if (!frame) {
+		if (frame.empty()) {
 			fprintf(stderr, "ERROR, frame is NULL.\n");
 			getchar();
 			break;
 		}
 
-		if (!frameCopy) {
-			frameCopy = cvCreateImage(cvSize(frame->width, frame->height),
-				IPL_DEPTH_8U, frame->nChannels);
-		}
+		faceDetector.DetectAndDraw(frame);
 
-		if (frame->origin == IPL_ORIGIN_TL)
-			cvCopy(frame, frameCopy, 0);
-		else
-			cvFlip(frame, frameCopy, 0);
+		cv::imshow("mywindow", frame);
 
-	//	faceDetector.DetectAndDraw(frameCopy);
-
-		cvShowImage("mywindow", frameCopy);
-
-		int c = (cvWaitKey(10) & 255);
+		int c = (cv::waitKey(10) & 255);
 		if (c == 27) break;
 		if (c == 32) controller.SendMessage("1", 1);
 	}
 
 	cvReleaseCapture(&capture);
 	cvDestroyWindow("mywindow");
-
 	return 0;
 }
 
