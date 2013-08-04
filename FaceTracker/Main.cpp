@@ -36,11 +36,13 @@ int main()
 	}
 	
 	cvNamedWindow("mywindow", CV_WINDOW_AUTOSIZE);
+	cvResizeWindow("mywindow", 640, 480);
 	
 	cv::Mat frame;
 
 	while (1) {
 		frame = cvQueryFrame(capture);
+
 		if (frame.empty()) {
 			fprintf(stderr, "ERROR, frame is NULL.\n");
 			getchar();
@@ -49,17 +51,20 @@ int main()
 
 		faceDetector.DetectAndDraw(frame);
 
+		controller.ZeroInOnFace(frame, faceDetector.CenterLastFace);
+
 		cv::imshow("mywindow", frame);
 
 		int c = (cv::waitKey(10) & 255);
 		if (c == 27) break;
-		if (c == 32) controller.SendMessage("1", 1);
 	}
 
 	cvReleaseCapture(&capture);
 	cvDestroyWindow("mywindow");
 	return 0;
 }
+
+
 
 int PromptForPort()
 {

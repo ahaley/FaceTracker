@@ -10,7 +10,8 @@ public:
 	bool Initialize();
 	void DetectAndDraw(cv::Mat image);
 
+	cv::Point CenterLastFace;
+
 private:
-	CvMemStorage* storage;
 	cv::CascadeClassifier classifier;
 };

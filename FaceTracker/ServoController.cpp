@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include "ServoController.h"
 
+static char servoTiltPosition = 90;
+static char servoPanPosition = 90;
+static char tiltChannel = 0;
+static char panChannel = 1;
+
+static int servoStepSize = 1;
 
 ServoController::ServoController()
 {
@@ -19,7 +25,9 @@ bool ServoController::Connect(int port)
 		FILE_FLAG_OVERLAPPED,
 		0);
 
-	SendMessage("hello,world", 10);
+
+	TransmitTilt();
+	TransmitPan();
 
 	if (hComm == INVALID_HANDLE_VALUE) {
 		return false;
@@ -34,6 +42,55 @@ void ServoController::Disconnect()
 	CloseHandle(hComm);
 }
 
+void ServoController::TransmitTilt()
+{
+	SendByte(tiltChannel);
+	SendByte(servoTiltPosition);
+}
+
+void ServoController::TransmitPan()
+{
+	SendByte(panChannel);
+	SendByte(servoPanPosition);
+}
+
+static int count = 0;
+
+void ServoController::IncreaseTilt()
+{
+	printf("%d: increasing tilt\n", count++);
+	servoTiltPosition += servoStepSize;
+	TransmitTilt();
+}
+
+void ServoController::DecreaseTilt()
+{
+	printf("%d: decreasing tilt\n", count++);
+	servoTiltPosition -= servoStepSize;
+	TransmitTilt();
+}
+
+void ServoController::IncreasePan()
+{
+	printf("%d: increasing pan\n", count++);
+
+	servoPanPosition += servoStepSize;
+	TransmitPan();
+}
+
+void ServoController::DecreasePan()
+{
+	printf("%d: decreasing pan\n", count++);
+	servoPanPosition -= servoStepSize;
+	TransmitPan();
+}
+
+
+bool ServoController::SendByte(char byte)
+{
+	char buffer[2] = { byte, 0 } ;
+	return SendMessage(buffer, 1);
+}
 
 bool ServoController::SendMessage(char * lpBuf, DWORD dwToWrite)
 {
@@ -83,4 +140,24 @@ bool ServoController::SendMessage(char * lpBuf, DWORD dwToWrite)
 
 	CloseHandle(osWrite.hEvent);
 	return fRes;
+}
+
+void ServoController::ZeroInOnFace(cv::Mat& frame, cv::Point& faceCenter)
+{
+	static const int slop = 10;
+	int centerCol = frame.cols >> 1;
+	if (faceCenter.x > centerCol + slop) {
+		IncreasePan();
+	}
+	else if (faceCenter.x < centerCol - slop) {
+		DecreasePan();
+	}
+
+	int centerRow = frame.rows >> 1;
+	if (faceCenter.y > centerRow + slop) {
+		DecreaseTilt();
+	}
+	if (faceCenter.y < centerRow - slop) {
+		IncreaseTilt();
+	}
 }

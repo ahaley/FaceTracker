@@ -18,7 +18,7 @@ bool FaceDetector::Initialize()
 		return false;
 	}
 
-	storage = cvCreateMemStorage(0);
+	return true;
 }
 
 
@@ -36,14 +36,15 @@ void FaceDetector::DetectAndDraw(cv::Mat image)
 
 	for (int i = 0; i < faces.size(); i++) {
 		
-		//cv::Point center(
-		//	faces[i].x + faces[i].width * 0.5,
-		//	faces[i].y + faces[i].height * 0.5);
+		CenterLastFace = cv::Point(
+			faces[i].x + (faces[i].width >> 1),
+			faces[i].y + (faces[i].height >> 1)
+		);
 
 		cv::rectangle(image,
 			cv::Rect(faces[i].x, faces[i].y, faces[i].width, faces[i].height),
 			cv::Scalar(255, 0, 0)
-			);
+		);
 	}
 
 
