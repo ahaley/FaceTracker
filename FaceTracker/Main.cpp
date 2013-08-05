@@ -20,11 +20,15 @@ int main()
 
 	ServoController controller;
 
-	if (!controller.Connect(PromptForPort())) {
-		fprintf(stderr, "ERROR: Could not connect to servo controller.\n");
-		cvReleaseCapture(&capture);
-		getchar();
-		return -1;
+	int port = PromptForPort();
+
+	if (port > 0) {
+		if (!controller.Connect(PromptForPort())) {
+			fprintf(stderr, "ERROR: Could not connect to servo controller.\n");
+			cvReleaseCapture(&capture);
+			getchar();
+			return -1;
+		}
 	}
 
 	FaceDetector faceDetector;
@@ -34,10 +38,10 @@ int main()
 		controller.Disconnect();
 		return -1;
 	}
-	
+
 	cvNamedWindow("mywindow", CV_WINDOW_AUTOSIZE);
 	cvResizeWindow("mywindow", 640, 480);
-	
+
 	cv::Mat frame;
 
 	while (1) {
@@ -68,7 +72,7 @@ int main()
 
 int PromptForPort()
 {
-	printf("Enter the COM port of the Servo Controller: ");
+	printf("Enter the COM port of the Servo Controller(0 for no serial): ");
 	int port;
 	scanf("%d", &port);
 	return port;

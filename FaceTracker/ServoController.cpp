@@ -10,6 +10,7 @@ static int servoStepSize = 1;
 
 ServoController::ServoController()
 {
+	connected = false;
 }
 
 bool ServoController::Connect(int port)
@@ -33,13 +34,16 @@ bool ServoController::Connect(int port)
 		return false;
 	}
 
-
+	connected = true;
 	return true;
 }
 
 void ServoController::Disconnect()
 {
-	CloseHandle(hComm);
+	if (connected) {
+		CloseHandle(hComm);
+		connected = false;
+	}
 }
 
 void ServoController::TransmitTilt()
@@ -98,6 +102,9 @@ bool ServoController::SendMessage(char * lpBuf, DWORD dwToWrite)
 	DWORD dwWritten;
 	DWORD dwRes;
 	bool fRes;
+
+	if (!connected)
+		return false;
 
 	// Create this write operation's OVERLAPPED structure's hEvent.
 	osWrite.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);

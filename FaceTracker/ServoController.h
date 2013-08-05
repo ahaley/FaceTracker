@@ -26,4 +26,6 @@ private:
 	void TransmitPan();
 
 	HANDLE hComm;
+
+	bool connected;
 };
